@@ -39,10 +39,10 @@ RUN git clone https://github.com/PX4/avoidance.git
 
 #build... and hope it works (i run with the no color flag because it takes WAY less time and somtimes
 #the build crashes if you don't)
-catkin build --no-color
+RUN catkin build --no-color
 
-echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
-source ~/.bashrc
+RUN echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+RUN source ~/.bashrc
 
 #AND THAT'S ALL THE SETUP UNTIL YOU GET FURTHER DOWN, WHICH IS FOR RUNNING
 #SPECIFIC PROGRAMS. DO THAT SEPERATELY HERE: https://github.com/PX4/PX4-Avoidance#run-on-hardware 
