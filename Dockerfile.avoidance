@@ -1,0 +1,48 @@
+#put the name of the container here
+FROM <container:name>
+
+#setup to install ros
+RUN sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+RUN apt update
+
+
+#now install ros (you may need to change the ros version to something else based on what ubuntu
+#version you are on)
+RUN apt install ros-melodic-desktop-full
+# Source ROS
+echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+
+#for ros-melodic install:
+RUN apt install python-rosdep
+RUN rodep init
+RUN rosdep update
+
+#setup the catkin workspace, modify the filepath of catkin if necessary
+RUN apt install python-catkin-tools
+RUN mkdir -p ~/catkin_ws/src
+
+
+#install a bunch of things ros/avoidance needs
+RUN apt install ros-melodic-mavros ros-melodic-mavros-extras
+
+RUN wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh
+RUN chmod +x install_geographiclib_datasets.sh
+RUN ./install_geographiclib_datasets.sh
+
+RUN apt install libpcl1 ros-melodic-octomap-*
+
+#go into the directory and clone the repo
+RUN cd ~/catkin_ws/src
+RUN git clone https://github.com/PX4/avoidance.git
+
+#build... and hope it works (i run with the no color flag because it takes WAY less time and somtimes
+#the build crashes if you don't)
+catkin build --no-color
+
+echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+
+#AND THAT'S ALL THE SETUP UNTIL YOU GET FURTHER DOWN, WHICH IS FOR RUNNING
+#SPECIFIC PROGRAMS. DO THAT SEPERATELY HERE: https://github.com/PX4/PX4-Avoidance#run-on-hardware 
